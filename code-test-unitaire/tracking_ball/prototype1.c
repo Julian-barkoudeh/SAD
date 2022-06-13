@@ -76,35 +76,35 @@ void loop() {
   radius = valeurradius.toInt();
   cercleJaune = radius/2;
   //pasHaut = (int) valeurHaut/10;
-  calculVitesse();
+  //calculVitesse();
   Serial.print("vitesse Haut :");
   // controler le servomoteur du haut
   if((vitesseHaut <= radius) || (vitesseHaut >= -radius)){
     set_vitesse_cyclique(HAUT,8);//vitesse 1/5
   }
   
-  if((vitesseHaut > radius && vitesseHaut <= ((int) radius*1.8) ) || (vitesseHaut < -radius && vitesseHaut >= -((int) radius*1.8))){
+  if((valeurHaut > radius && vitesseHaut <= ((int) radius*1.8) ) || (valeurHaut < -radius && valeurHaut >= -((int) radius*1.8))){
     set_vitesse_cyclique(HAUT,5);//vitesse 1/3
   }
   
-  if((vitesseHaut > ((int) radius*1.8)&& vitesseHaut <= 400) || (vitesseHaut < -((int) radius*1.8) && vitesseHaut >= -400)) {
+  if((valeurHaut > ((int) radius*1.8)&& valeurHaut <= 400) || (valeurHaut < -((int) radius*1.8) && valeurHaut >= -400)) {
     set_vitesse_cyclique(HAUT,2);//vitesse 1/3
   }
-  if((vitesseHaut >500) || (vitesseHaut <-500)){
+  if((valeurHaut >500) || (valeurHaut <-500)){
     pasHaut = 1;
   }
 
 
-  if((vitesseBas <= radius) || (vitesseBas >= -radius)){
+  if((valeurBas <= radius) || (valeurBas >= -radius)){
      set_vitesse_cyclique(HAUT,8);//vitesse 1/5
   }
-  if((vitesseBas > radius && vitesseBas <= ((int) radius*1.8)   ) || (vitesseBas < -radius && vitesseBas >=  -((int) radius*1.8) )){
+  if((valeurBas > radius && valeurBas <= ((int) radius*1.8)   ) || (valeurBas < -radius && valeurBas >=  -((int) radius*1.8) )){
    set_vitesse_cyclique(HAUT,5);//vitesse 1/3
   }
-  if((vitesseBas > ((int) radius*1.8) && vitesseBas <= 400) || (vitesseBas <-((int) radius*1.8)&& vitesseBas >= -400)){
+  if((valeurBas > ((int) radius*1.8) && valeurBas <= 400) || (valeurBas <-((int) radius*1.8)&& valeurBas >= -400)){
    set_vitesse_cyclique(HAUT,2);//vitesse 1/3
   }
-  else if((vitesseBas >500) || (vitesseBas < -500)){
+  else if((valeurBas >500) || (valeurBas < -500)){
     pasBas = 1;
   }
   //Serial.print("PasHaut : ");
@@ -119,16 +119,14 @@ void loop() {
 /*
   ////Serial.print("valeurBas : ");
   ////Serial.println(valeurBas );
-
   
-
   ////Serial.print("raidus : ");
   ////Serial.println(radius );*/
   
   
   //Bas
   
-  if (vitesseHaut < -cercleJaune && positionServoHaut-1 >= 30)
+  if (valeurHaut < -cercleJaune && positionServoHaut-1 >= 30)
   {
     positionServoHaut -= pasHaut;
     servoHaut.write(positionServoHaut);
@@ -137,7 +135,7 @@ void loop() {
   }
 
   //Haut
-  if (vitesseHaut > cercleJaune && positionServoHaut+1<=100)
+  if (valeurHaut > cercleJaune && positionServoHaut+1<=100)
   {
     positionServoHaut += pasHaut;
     servoHaut.write(positionServoHaut);
@@ -152,7 +150,7 @@ void loop() {
 
   // Droite
   
-  if (vitesseBas < -cercleJaune && positionServoBas-1>=0)
+  if (valeurBas < -cercleJaune && positionServoBas-1>=0)
   {
     positionServoBas -= pasBas;
     servoBas.write(positionServoBas);
@@ -162,7 +160,7 @@ void loop() {
   }
   
   // Gauche
-  if (vitesseBas > cercleJaune && positionServoBas+1<120)
+  if (valeurBas > cercleJaune && positionServoBas+1<120)
   {
     positionServoBas += pasBas;
     servoBas.write(positionServoBas);
