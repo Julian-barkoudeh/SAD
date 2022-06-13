@@ -2,6 +2,7 @@
 from collections import deque
 from imutils.video import VideoStream
 import numpy as np
+from numpy import array
 import argparse
 import cv2
 import imutils
@@ -10,8 +11,32 @@ import math
 import serial
 
 #communication avec la liaison serie
-serial_port = serial.Serial(port='COM6', baudrate=115200, timeout=0.1)
+serial_port = serial.Serial(port='COM11', baudrate=115200, timeout=0.1)
+haut_moy_tab = array([0,0,0,0,0,0,0,0,0])
+bas_moy_tab = array([0,0,0,0,0,0,0,0,0])
 
+haut_moy = 0
+bas_moy = 0
+cptPos = 0
+
+def calcul_moy(valHaut, valBas):
+    global cptPos
+    global haut_moy
+    global bas_moy
+    global haut_moy_tab
+    global bas_moy_tab
+    
+    somme_haut = 0
+    somme_bas = 0
+    haut_moy_tab[cptPos%10] = valHaut
+    bas_moy_tab[cptPos%10] = valBas
+    cptPos = cptPos + 1
+    for i in range(0, 9):
+        somme_haut = somme_haut + haut_moy_tab[cptPos%10]
+        somme_bas = somme_bas + haut_moy_tab[cptPos%10]
+    haut_moy = int(somme_haut/10)
+    bas_moy = int(somme_bas/10)
+    
 def write_read(valeur):
     serial_port.write(bytes(valeur,'utf-8'))
     
@@ -112,7 +137,7 @@ while True:
             # Zone pour tirer, cercle initial divise par 2
             cv2.circle(frame, (int(x), int(y)), int(radius/2), (0, 0, 255), 2)
             messageDistance = "x = " + str(valeurBas) +",    y = " + str(valeurHaut)
-            #cv2.putText(frame, text=messageDistance, org=(int(x), int(y+20)), fontFace=cv2.FONT_HERSHEY_TRIPLEX, fontScale=1, color=(255,0, 255),thickness=1)
+            cv2.putText(frame, text=messageDistance, org=(int(x), int(y+20)), fontFace=cv2.FONT_HERSHEY_TRIPLEX, fontScale=1, color=(255,0, 255),thickness=1)
             # Distance entre middleScreen et centre objet detecte
             cv2.line(frame, middleScreen, centerObject, (255,0,0), 5)
 
@@ -143,23 +168,22 @@ while True:
                 if (centerObjectX < middleScreenX):
                     valeurBas = int(-(centerObjectX - middleScreenX))
                     print(int(valeurBas))
-                    print("GAUCHE")
+                    #print("GAUCHE")
                 else:
                     valeurBas = int(-(centerObjectX - middleScreenX))
                     print(int(valeurBas))
-                    print("DROITE")
+                    #print("DROITE")
             if not (middleScreenY == centerObjectY):
                 if (centerObjectY < middleScreenY):
                     valeurHaut = int((middleScreenY - centerObjectY))
-                    #print(int(valeurHaut))
+                    print(int(valeurHaut))
                     #print("HAUT")
                 else:
                     valeurHaut = int((middleScreenY - centerObjectY))
-                    #print(int(valeurHaut))
+                    print(int(valeurHaut))
                     #print("BAS")
         
-        #if ((middleScreenX - radius/2 < centerObjectX < middleScreenX + radius/2) & (middleScreenY - radius/2 < centerObjectY < middleScreenY + radius/2)):
-        if ((middleScreenX - 80 < centerObjectX < middleScreenX + 80) & (middleScreenY - 80 < centerObjectY < middleScreenY + 80)):
+        if ((middleScreenX - radius/2 < centerObjectX < middleScreenX + radius/2) & (middleScreenY - radius/2 < centerObjectY < middleScreenY + radius/2)):
             tirer=1
             print("TIRRRREEEEEERRR")
         else:
@@ -169,12 +193,13 @@ while True:
         valeurBas=0
         valeurHaut=0
 
-    #envoyer donnee 
-
-    message="/"+str(valeurHaut)+"/"+str(valeurBas)+"/"+str(tirer)+"/"+str(radius)
+    #envoyer donnÂ²ees
+    calcul_moy(valeurHaut,valeurBas)
+    
+    message="/"+str(bas_moy)+"/"+str(haut_moy)+"/"+str(tirer)+"/"+str(radius)
     value = write_read(message)
     #print(message) 
-    print(value) 
+    #print(value) 
     key = cv2.waitKey(1) & 0xFF
     # if the 'q' key is pressed, stop the loop
     if key == ord("q"):
